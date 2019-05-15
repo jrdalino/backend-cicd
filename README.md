@@ -1,8 +1,8 @@
-# Backend CICD using CodeCommit CodeBuild CodePipeline
+# Backend CICD using CodeCommit CodeBuild CodePipeline Kubernetes
 
-## Step 5: Setup CI/CD for Back End Service
+## Step 1: Setup CI/CD for Back End Service
 
-### Step 5.1: Create Codebuild and Codepipeline Role (eks-calculator-codebuild-codepipeline-iam-role)
+### Step 1.1: Create Codebuild and Codepipeline Role (eks-calculator-codebuild-codepipeline-iam-role)
 ```
 $ cd ~/environment/calculator-backend
 $ mkdir aws-cli
@@ -129,12 +129,12 @@ $ aws cloudformation create-stack \
 --template-body file://~/environment/calculator-backend/aws-cli/eks-calculator-codebuild-codepipeline-iam-role.yaml
 ```
 
-### Step 5.2: Create an S3 Bucket for Pipeline Artifacts
+### Step 1.2: Create an S3 Bucket for Pipeline Artifacts
 ```
 $ aws s3 mb s3://jrdalino-calculator-backend-artifacts
 ```
 
-### Step 5.3: Modify S3 Bucket Policy
+### Step 1.3: Modify S3 Bucket Policy
 ```
 $ vi ~/environment/calculator-backend/aws-cli/artifacts-bucket-policy.json
 ```
@@ -180,14 +180,14 @@ $ vi ~/environment/calculator-backend/aws-cli/artifacts-bucket-policy.json
 }
 ```
 
-### Step 5.4: Grant S3 Bucket access to your CI/CD Pipeline
+### Step 1.4: Grant S3 Bucket access to your CI/CD Pipeline
 ```
 $ aws s3api put-bucket-policy \
 --bucket jrdalino-calculator-backend-artifacts \
 --policy file://~/environment/calculator-backend/aws-cli/artifacts-bucket-policy.json
 ```
 
-### Step 5.5: View/Modify Buildspec file
+### Step 1.5: View/Modify Buildspec file
 ```
 $ cd ~/environment/calculator-backend
 $ vi ~/environment/calculator-backend/buildspec.yml
@@ -216,7 +216,7 @@ artifacts:
   files: imagedefinitions.json
 ```
 
-### Step 5.6: View/Modify CodeBuild Project Input File
+### Step 1.6: View/Modify CodeBuild Project Input File
 ```
 $ vi ~/environment/calculator-backend/aws-cli/code-build-project.json
 ```
@@ -255,13 +255,13 @@ $ vi ~/environment/calculator-backend/aws-cli/code-build-project.json
 }
 ```
 
-### Step 5.7: Create the CodeBuild Project
+### Step 1.7: Create the CodeBuild Project
 ```
 $ aws codebuild create-project \
 --cli-input-json file://~/environment/calculator-backend/aws-cli/code-build-project.json
 ```
 
-### Step 5.8: Setup Lambda for deployment
+### Step 1.8: Setup Lambda for deployment
 ```
 $ cd ~/environment/
 $ git clone https://github.com/BranLiang/lambda-eks
@@ -272,13 +272,13 @@ $ sed -i -e "s#\$EKS_CLUSTER_NAME#calculator-eksctl#g" ./config
 $ sed -i -e "s#\$EKS_CLUSTER_USER_NAME#lambda#g" ./config
 ```
 
-### Step 5.9: Then run the following command replacing secret name to update your token
+### Step 1.9: Then run the following command replacing secret name to update your token
 ```
 $ kubectl get secrets
 $ sed -i -e "s#\$TOKEN#$(kubectl get secret $SECRET_NAME -o json | jq -r '.data["token"]' | base64 -D)#g" ./config
 ```
 
-### Step 5.10: Build, package and deploy the Lambda Kube Client Function
+### Step 1.10: Build, package and deploy the Lambda Kube Client Function
 ```
 $ npm install
 $ zip -r ../lambda-package_v1.zip .
@@ -293,12 +293,12 @@ $ aws lambda create-function \
 --memory-size 128
 ```
 
-### Step 5.11: Provide admin access to default service account
+### Step 11.11: Provide admin access to default service account
 ```
 $ kubectl create clusterrolebinding default-admin --clusterrole cluster-admin --serviceaccount=default:default
 ```
 
-### Step 5.12: Modify CodePipeline Input File
+### Step 1.12: Modify CodePipeline Input File
 ```
 $ vi ~/environment/calculator-backend/aws-cli/code-pipeline.json
 ```
@@ -373,13 +373,13 @@ $ vi ~/environment/calculator-backend/aws-cli/code-pipeline.json
 }
 ```
 
-### Step 5.13: Create a pipeline in CodePipeline
+### Step 1.13: Create a pipeline in CodePipeline
 ```
 $ aws codepipeline create-pipeline \
 --cli-input-json file://~/environment/calculator-backend/aws-cli/code-pipeline.json
 ```
 
-### Step 5.14: Manually modify pipeline Codepipeline to add Deployment stage using created Lambda function.
+### Step 1.14: Manually modify pipeline Codepipeline to add Deployment stage using created Lambda function.
 - Click Edit CodePipeline
 - Add a new stage after Build Stage
 - Enter stage name as Deploy and save.
@@ -392,7 +392,7 @@ $ aws codepipeline create-pipeline \
 - User parameter: calculator-backend
 - Click Save
 
-### Step 5.15: Make a small code change, push and validate changes
+### Step 1.15: Make a small code change, push and validate changes
 
 ### (Optional) Clean up
 ```
