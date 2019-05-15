@@ -1,4 +1,4 @@
-# Backend CICD (CodeCommit, CodeBuild, CodePipeline)
+# Backend CICD using CodeCommit CodeBuild CodePipeline
 
 ## Step 5: Setup CI/CD for Back End Service
 
